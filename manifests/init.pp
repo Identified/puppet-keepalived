@@ -1,64 +1,36 @@
-# == Class: keepalived
-#
-# This class setup the basis for keeapalive, knowingly package installation
-# and some global variables.
-#
-# The keepalived::instance define depends on this class.
-#
-# === Parameters
-#
-# [*notification_email_to*] = [ "root@${domain}" ]
-#   An array of emails to send notifications to
-#
-# [*notification_from*] = "keepalived@${domain}"
-#   The source adress of notification messages
-#
-# [*smtp_server*] = 'localhost'
-#   The SMTP server to use to send notifications.
-#
-# [*smtp_connect_timeout*] = '30'
-#   The SMTP server to use to send notifications.
-#
-# [*router_id*] = $::hostname
-#   The router_id identifies us on the network.
-#
-# === Variables
-#
-# [*$keepalived::variables::keepalived_conf*]
-#   Path to keepalived.conf configuration file
-#
-# === Examples
-#
-#  class { keepalived: }
-#
-# === Authors
-#
-# Author Name <bruno.leon@unyonsys.com>
-#
-# === Copyright
-#
-# Copyright 2012 Bruno LEON, unless otherwise noted.
-#
 class keepalived (
-  $notification_email_to   = [ "root@${domain}" ],
-  $notification_email_from = "keepalived@${domain}",
-  $smtp_server             = 'localhost',
-  $smtp_connect_timeout    = '30',
+  $notification_email      = undef,
+  $notification_email_from = undef,
+  $smtp_server             = undef,
+  $smtp_connect_timeout    = undef,
+  $config_dir              = $keepalived::params::config_dir,
+  $ensure                  = installed,
+  $version                 = $keepalived::params::version,
   $router_id               = $::hostname,
-  $static_ipaddress        = [],
-) {
+) inherits keepalived::params {
 
-  Class[ "${module_name}::install" ] -> Class[ "${module_name}::config" ] ~> Class[ "${module_name}::service" ]
+  Class['keepalived::install'] -> Concat['/etc/keepalived/keepalived.conf'] -> Service['keepalived']
 
-  include "${module_name}::variables"
-  class { "${module_name}::install": }
-  class { "${module_name}::config":
-    notification_email_to   => $keepalived::notification_email_to,
-    notification_email_from => $keepalived::notification_email_from,
-    smtp_server             => $keepalived::smtp_server,
-    smtp_connect_timeout    => $keepalived::smtp_connect_timeout,
-    router_id               => $keepalived::router_id,
-    static_ipaddress        => $keepalived::static_ipaddress,
+  case $version {
+    undef:   { class { 'keepalived::install': version => 'apt-pkg'} }
+    default: { class { 'keepalived::install': version => $version } }
   }
-  class { "${module_name}::service": }
+
+  concat { '/etc/keepalived/keepalived.conf':
+    warn    => true,
+  }
+
+  concat::fragment { 'global_defs':
+    target  => '/etc/keepalived/keepalived.conf',
+    content => template('keepalived/global_defs.erb'),
+    order   => 01,
+  }
+
+  service { 'keepalived':
+    ensure    => running,
+    enable    => true,
+    hasstatus => false,
+    pattern   => 'keepalived',
+  }
+
 }

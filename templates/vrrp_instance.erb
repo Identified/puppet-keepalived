@@ -1,0 +1,44 @@
+vrrp_instance <%= @name %> {
+  state <%= @state %>
+  interface <%= @interface %>
+  virtual_router_id <%= @virtual_router_id %>
+  priority  <%= @priority %>
+  advert_int <%= @advert_int %>
+<% if @auth_type and @auth_pass -%>
+  authentication {
+    auth_type <%= @auth_type %>
+    auth_pass <%= @auth_pass %>
+  }
+<% end -%>
+  virtual_ipaddress {
+<% @virtual_ips.each do |vip| -%>
+    <%= vip %>
+<% end %>
+  }
+<% @track_script = [@track_script] if @track_script.class == String %>
+<% if @track_script.length > 0 -%>
+  track_script {
+  <% @track_script.each do |script| -%>
+    <%= script %>
+  <% end -%>
+  }
+<% end -%>
+<% if @notify_master -%>
+  notify_master "<%= @notify_master %>"
+<% end -%>
+<% if @notify_backup -%>
+  notify_backup "<%= @notify_backup %>"
+<% end -%>
+<% if @notify_fault -%>
+  notify_fault "<%= @notify_fault %>"
+<% end -%>
+<% if @notify_all -%>
+  notify "<%= @notify_all %>"
+<% end -%>
+<% if @smtp_alert -%>
+  smtp_alert
+<% end -%>
+<% if @nopreempt -%>
+  nopreempt
+<% end -%>
+}
