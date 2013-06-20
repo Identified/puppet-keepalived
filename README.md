@@ -4,8 +4,8 @@ puppet-keepalived
 Puppet module to manage Keepalived
 
 # Authors
-Identified, Inc. (Active maintainer of this code)
-Bruno LEON (commit f2c1e1233d308236fc3ef6fce0da927249e99767 and prior)
+* Identified, Inc. (Active maintainer of this code)
+* Bruno LEON (commit f2c1e1233d308236fc3ef6fce0da927249e99767 and prior)
 
 ## Contributing
 
