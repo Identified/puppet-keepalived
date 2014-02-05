@@ -50,7 +50,8 @@ class keepalived::install($version) {
     }
 
     exec { 'update-alternatives':
-      command => "sudo update-alternatives --install /usr/sbin/keepalived keepalived /usr/local/sbin/keepalived 1",
+      command => "sudo update-alternatives --install /usr/sbin/keepalived keepalived /usr/local/sbin/keepalived 1 && touch /tmp/update_alternatives_updated",
+      creates => '/tmp/update_alternatives_updated',
       require => Exec['install'],
       cwd => '/home',
     }
