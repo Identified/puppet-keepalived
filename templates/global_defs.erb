@@ -1,7 +1,7 @@
 global_defs {
-<% if @notification_email_to && @notification_email_from && @smtp_server && @smpt_connect_timeout -%>
+<% if @notification_email && @notification_email_from && @smtp_server && @smtp_connect_timeout -%>
   notification_email {
-  <% notification_email.each do |email| -%>
+  <% @notification_email.each do |email| -%>
     <%= email %>
   <% end -%>}
   notification_email_from <%= @notification_email_from %>
