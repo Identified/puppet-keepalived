@@ -31,6 +31,7 @@ class keepalived (
     enable    => true,
     hasstatus => false,
     pattern   => 'keepalived',
+    subscribe => Concat['/etc/keepalived/keepalived.conf'],
   }
 
 }
